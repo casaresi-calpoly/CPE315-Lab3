@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 //Lab 2- Rajvir Vyas and Daniel Casares-Iglesias
 public class Addi extends Instruction{
     String ADDI_OPCODE = "001000";
@@ -44,5 +46,41 @@ public class Addi extends Instruction{
             invalidLine();
         }
         machineCode = ADDI_OPCODE + " "+ rs + " "+ rt + " "+ intToBinary(immediate, 16);
+    }
+
+    @Override
+    public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
+        // The 2 registers used in addi
+        int rs = 0;
+        int rt = 1;
+
+        // The minimum length for this command is 13 (addi$tt,$tt,0)
+        if (code.length() < 13) {
+            invalidLine();
+        }
+        // Splits the different parameters of the command
+        String[] parts = code.substring(4).trim().split("\s*,\s*");
+
+        // Checks to make sure there were exactly 3 parameters
+        if (parts.length != 3) {
+            invalidLine();
+        }
+
+
+        // Checks if the immediate is in dec or hex and converts it to its binary representation
+        int immediate = 0;
+        try {
+            if (parts[2].matches("^(0x)[0-9A-F]{1,4}$")) {
+                immediate = Integer.valueOf(parts[2].substring(2), 16);
+            }
+            else {
+                immediate = Integer.parseInt(parts[2]);
+            }
+        } catch (Exception NumberFormatException) {
+            invalidLine();
+        }
+        registers.put(parts[rt], registers.get(parts[rs]) + registers.get(parts[immediate]));
+
+        return pc + 1;
     }
 }

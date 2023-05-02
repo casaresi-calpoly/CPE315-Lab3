@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 //Lab 2- Rajvir Vyas and Daniel Casares-Iglesias
 public class Sll extends Instruction {
     String SLL_OPCODE = "000000";
@@ -46,5 +48,39 @@ public class Sll extends Instruction {
             invalidLine();
         }
         machineCode = SLL_OPCODE + " "+ RS + " "+ rt + " "+ rd + " "+ intToBinary(sa, 5) + " "+ FUNCT;
+    }
+
+    @Override
+    public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
+        // The 2 registers used in sll
+        int rt = 0, rd = 1;
+        int sa = 0;
+
+        // The minimum length for this command is 12 (sll$tt,$tt,1)
+        if (code.length() < 12) {
+            invalidLine();
+        }
+        // Splits the different parameters of the command
+        String[] parts = code.substring(3).trim().split("\s*,\s*");
+
+        // Checks to make sure there were exactly 3 parameters
+        if (parts.length != 3) {
+            invalidLine();
+        }
+
+
+        // Extracts the sa integer, whether in hex or in decimal form, from the parameter
+        try {
+            if (parts[2].matches("^(0x)[0-9A-F]{1,4}$")) {
+                sa = Integer.valueOf(parts[2].substring(2), 16);
+            }
+            else {
+                sa = Integer.parseInt(parts[2]);
+            }
+        } catch (Exception NumberFormatException) {
+            invalidLine();
+        }
+        registers.put(parts[rd], registers.get(parts[rt]) << registers.get(parts[sa]));
+        return pc+1;
     }
 }

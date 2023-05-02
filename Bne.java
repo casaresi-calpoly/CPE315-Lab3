@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 //Lab 2- Rajvir Vyas and Daniel Casares-Iglesias
 public class Bne extends Instruction{
     String BNE_OPCODE = "000101";
@@ -42,5 +44,36 @@ public class Bne extends Instruction{
             invalidLine();
         }
         machineCode = BNE_OPCODE + " "+ rs + " "+ rt + " "+ intToBinary(offset, 16);
+    }
+
+    @Override
+    public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
+        int rs = 0, rt = 1;
+
+        // The minimum length for this command is 14 (and$tt,$tt,$tt)
+        if (code.length() < 14) {
+            invalidLine();
+        }
+        // Splits the different parameters of the command
+        String[] parts = code.substring(3).trim().split("\s*,\s*");
+
+        // Checks to make sure there were exactly 3 parameters
+        if (parts.length != 3) {
+            invalidLine();
+        }
+        int offset = 0;
+        if (registers.get(parts[0]) !=registers.get(parts[1])) {
+
+            try {
+                if (parts[2].matches("^(0x)[0-9A-F]{1,4}$")) {
+                    offset = Integer.valueOf(parts[2].substring(2), 16);
+                } else {
+                    offset = Integer.parseInt(parts[2]);
+                }
+            } catch (Exception NumberFormatException) {
+                invalidLine();
+            }
+        }
+        return offset;
     }
 }
