@@ -14,17 +14,42 @@ public class Main {
     public static void main(String[] args) throws IOException {
         // Press Alt+Enter with your caret at the highlighted text to see how
         // IntelliJ IDEA suggests fixing it.
+        if (args.length > 2) {
+            System.out.println("invalid command: java Main asmFile [scriptFile]");
+            System.exit(0);
+        }
 
         HashMap<String, Integer> labels = new HashMap<String, Integer>();
         ArrayList<String> stringInstructions = new ArrayList<String>();
-        System.out.println(new File(".").getAbsoluteFile());
         BufferedReader br = new BufferedReader(new FileReader(args[0]));
+        BufferedReader instBr;
+        int[] dataMemory = new int[8192];
+        int pc = STARTING_ADDRESS;
+
+
+        HashMap<String, Integer> registers = generateRegisterHashMap();
+
 
         findLabels(br, labels, stringInstructions);
         br.close();
+
         Instruction[] instructions = new Instruction[stringInstructions.size()];
         readInstructions(labels, stringInstructions, instructions);
 
+        if (args.length == 2) {
+            instBr = new BufferedReader(new FileReader(args[1]));
+            String script;
+            while ((script = br.readLine()) != null) {
+                pc = runScriptCommand(registers, dataMemory, instructions, script, pc);
+            }
+        }
+        else {
+            while (pc != -1) {
+                System.out.print("\nmips> ");
+                String script = System.console().readLine();
+                pc = runScriptCommand(registers, dataMemory, instructions, script, pc);
+            }
+        }
 
     }
 
@@ -97,7 +122,7 @@ public class Main {
                 switch (current.substring(0,4)) {
                     case "addi":
                         instructions[i] = new Addi(stringInstructions.get(i), address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                 }
@@ -106,27 +131,27 @@ public class Main {
                 switch (current.substring(0,3)) {
                     case "and":
                         instructions[i] = new And(stringInstructions.get(i), address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                     case "add":
                         instructions[i] = new Add(stringInstructions.get(i), address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                     case "sll":
                         instructions[i] = new Sll(stringInstructions.get(i), address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                     case "sub":
                         instructions[i] = new Sub(stringInstructions.get(i), address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                     case "slt":
                         instructions[i] = new Slt(stringInstructions.get(i), address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                     case "beq":
@@ -142,7 +167,7 @@ public class Main {
                         instructions[i] = new Beq(stringInstructions.get(i).substring(0,
                                 stringInstructions.get(i).lastIndexOf(44) + 1) + target, address);
                         found = true;
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         break;
                     case "bne":
                         l = stringInstructions.get(i).substring(stringInstructions.get(i).lastIndexOf(44) + 1)
@@ -157,7 +182,7 @@ public class Main {
                         instructions[i] = new Bne(stringInstructions.get(i).substring(0,
                                 stringInstructions.get(i).lastIndexOf(44) + 1) + target, address);
                         found = true;
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         break;
 
                     case "jal":
@@ -171,7 +196,7 @@ public class Main {
                         }
                         instructions[i] = new Jal(stringInstructions.get(i).substring(0, 3) + " " + target, address);
                         found = true;
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         break;
                 }
             }
@@ -179,22 +204,22 @@ public class Main {
                 switch (current.substring(0,2)) {
                     case "or":
                         instructions[i] = new Or(stringInstructions.get(i),address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                     case "lw":
                         instructions[i] = new Lw(stringInstructions.get(i),address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                     case "sw":
                         instructions[i] = new Sw(stringInstructions.get(i),address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                     case "jr":
                         instructions[i] = new Jr(stringInstructions.get(i),address);
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                 }
@@ -212,7 +237,7 @@ public class Main {
                         }
                         instructions[i] = new J(stringInstructions.get(i).substring(0, 1) + " " + target, address);
                         found = true;
-                        System.out.println(instructions[i].getMachineCode());
+//                        System.out.println(instructions[i].getMachineCode());
                         found = true;
                         break;
                 }
@@ -223,6 +248,129 @@ public class Main {
             }
         }
     }
+
+    private static int runScriptCommand(HashMap<String, Integer> registers, int[] dataMemory, Instruction[] instructions,
+                                        String script, int pc) {
+        switch(script) {
+            // Show Help
+            case "h":
+                System.out.println("h = show help\n" +
+                        "d = dump register state\n" +
+                        "s = single step through the program (i.e. execute 1 instruction and stop)\n" +
+                        "s num = step through num instructions of the program\n" +
+                        "r = run until the program ends\n" +
+                        "m num1 num2 = display data memory from location num1 to num2\n" +
+                        "c = clear all registers, memory, and the program counter to 0\n" +
+                        "q = exit the program");
+                return pc;
+            // Dump Registers
+            case "d":
+                System.out.printf("pc = %d\n" +
+                        "\t$0 = %d         $v0 = %d        $v1 = %d        $a0 = %d\n" +
+                        "\t$a1 = %d        $a2 = %d        $a3 = %d        $t0 = %d\n" +
+                        "\t$t1 = %d        $t2 = %d        $t3 = %d        $t4 = %d\n" +
+                        "\t$t5 = %d        $t6 = %d        $t7 = %d        $s0 = %d\n" +
+                        "\t$s1 = %d        $s2 = %d        $s3 = %d        $s4 = %d\n" +
+                        "\t$s5 = %d        $s6 = %d        $s7 = %d        $t8 = %d\n" +
+                        "\t$t9 = %d        $sp = %d        $ra = %d", pc, registers.get("$0"), registers.get("$v0"),
+                        registers.get("$v1"), registers.get("$a0"), registers.get("$a1"), registers.get("$a2"),
+                        registers.get("$a3"), registers.get("$t0"), registers.get("$t1"), registers.get("$t2"),
+                        registers.get("$t3"), registers.get("$t4"), registers.get("$t5"), registers.get("$t6"),
+                        registers.get("$t7"), registers.get("$s0"), registers.get("$s1"), registers.get("$s2"),
+                        registers.get("$s3"), registers.get("$s4"), registers.get("$s5"), registers.get("$s6"),
+                        registers.get("$s7"), registers.get("$t8"), registers.get("$t9"), registers.get("$sp"),
+                        registers.get("$ra"));
+                return pc;
+            // Single Step through program
+            case "s":
+                if (pc >= instructions.length) {
+                    System.out.println("Invalid script command: No instructions left to run");
+                    System.exit(0);
+                }
+                pc = instructions[pc].run_code(registers, dataMemory, pc);
+                System.out.println("1 instruction(s) executed");
+                return pc;
+            // Run until program ends
+            case "r":
+                while(pc < instructions.length) {
+                    pc = instructions[pc].run_code(registers, dataMemory, pc);
+                }
+                return pc;
+            // Clear all registers, memory, and the program counter to 0
+            case "c":
+                // Clear registers
+                registers.replaceAll((key, value) -> value = 0);
+                // Clear memory
+                Arrays.fill(dataMemory, 0);
+                System.out.println("Simulator reset");
+                // Reset program counter
+                return STARTING_ADDRESS;
+            // Exit the program
+            case "q":
+                return -1;
+            default:
+                // Step through num instructions
+                if (script.matches("^s [0-9]+$")) {
+                    for (int i = 0; i < Integer.parseInt(script.substring(2)); i++) {
+                        if (pc >= instructions.length) {
+                            System.out.println("Invalid script command: No instructions left to run");
+                            System.exit(0);
+                        }
+                        pc = instructions[pc].run_code(registers, dataMemory, pc);
+                    }
+                    System.out.printf("%d instruction(s) executed", Integer.parseInt(script.substring(2)));
+                    return pc;
+                }
+                // Display data memory from location num1 to num2
+                else if (script.matches("^m [0-9]+ [0-9]+$")) {
+                    String[] indices = script.substring(2).split("\s");
+                    for (int i = Integer.parseInt(indices[0]); i < Integer.parseInt(indices[1]); i++) {
+                        System.out.printf("\n[%d] = %d", i, dataMemory[i]);
+                    }
+                    return pc;
+                }
+                // Invalid script command
+                else {
+                    System.out.println("Invalid script command");
+                    System.exit(0);
+                }
+        }
+        return -1;
+    }
+
+    private static HashMap<String, Integer> generateRegisterHashMap() {
+        HashMap<String, Integer> registers = new HashMap<String, Integer>();
+        registers.put("$0", 0);
+        registers.put("$zero", 0);
+        registers.put("$v0", 0);
+        registers.put("$v1", 0);
+        registers.put("$a0", 0);
+        registers.put("$a1", 0);
+        registers.put("$a2", 0);
+        registers.put("$a3", 0);
+        registers.put("$t0", 0);
+        registers.put("$t1", 0);
+        registers.put("$t2", 0);
+        registers.put("$t3", 0);
+        registers.put("$t4", 0);
+        registers.put("$t5", 0);
+        registers.put("$t6", 0);
+        registers.put("$t7", 0);
+        registers.put("$s0", 0);
+        registers.put("$s1", 0);
+        registers.put("$s2", 0);
+        registers.put("$s3", 0);
+        registers.put("$s4", 0);
+        registers.put("$s5", 0);
+        registers.put("$s6", 0);
+        registers.put("$s7", 0);
+        registers.put("$t8", 0);
+        registers.put("$t9", 0);
+        registers.put("$sp", 0);
+        registers.put("$ra", 0);
+        return registers;
+    }
+
     public static void invalidLine(String line, int address){
 
         Pattern pattern = Pattern.compile("^[^\\s\\$]*");
@@ -233,5 +381,4 @@ public class Main {
         }
         System.exit(0);
     }
-
 }
