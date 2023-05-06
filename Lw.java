@@ -1,3 +1,5 @@
+import java.util.HashMap;
+
 //Lab 2- Rajvir Vyas and Daniel Casares-Iglesias
 public class Lw extends Instruction{
     String LW_OPCODE = "100011";
@@ -43,5 +45,42 @@ public class Lw extends Instruction{
             invalidLine();
         }
         machineCode = LW_OPCODE + " "+ rs + " "+ rt + " "+ intToBinary(offset, 16);
+    }
+
+    @Override
+    public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
+        // The 2 registers used in lw
+        int rs = 0,rt = 1;
+
+        // The minimum length for this command is 12 (lw$tt,x($tt))
+        if (code.length() < 12 ) {
+            invalidLine();
+        }
+        // Splits the different parameters of the command
+        code = code.replaceAll("[(]", ",");
+        code = code.replaceAll("[)]", "");
+        String[] parts = code.substring(2).trim().split("\s*,\s*");
+
+        // Checks to make sure there were exactly 3 parameters
+        if (parts.length != 3) {
+            invalidLine();
+        }
+
+
+        // Checks if the offset is in dec or hex and converts it to its binary representation
+        int offset = 0;
+        try {
+            if (parts[1].matches("^(0x)[0-9A-F]{1,4}$")) {
+                offset = Integer.valueOf(parts[1].substring(2), 16);
+            }
+            else {
+                offset = Integer.parseInt(parts[1]);
+            }
+        } catch (Exception NumberFormatException) {
+            invalidLine();
+        }
+        registers.put(parts[rt], registers.get(parts[offset]) + registers.get(parts[rs]));
+
+        return pc+1; //unusre how to use data memory
     }
 }

@@ -61,6 +61,6 @@ public class Jal extends Instruction{
         } catch (Exception NumberFormatException) {
             invalidLine();
         }
-        return target;   //how to put target in $ra since that is a label
+        return target;   //how to put target in $ra since that is a label; r31=pc
     }
 }

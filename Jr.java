@@ -39,12 +39,14 @@ public class Jr extends Instruction{
             invalidLine();
         }
 
-        // Checks that the registers are in the correct locations and have the proper formatting
-        // Also sets the register values to their bit form
-        if ((rs = registerAddress(code.trim().substring(2).trim())) == null) {
+        // Splits the different parameters of the command
+        String[] parts = code.substring(2).trim().split("\s*,\s*");
+
+        if (parts.length != 1) {
             invalidLine();
         }
 
-        machineCode = Jr_OPCODE + " " + rs  + " " +SHAMT + " "+FUNCT ;
+        registers.put(parts[pc], registers.get(parts[rs]));
+        return pc+1; //or just return rs?
     }
 }
