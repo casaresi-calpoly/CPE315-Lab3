@@ -51,19 +51,11 @@ public class Beq extends Instruction{
         // The 2 registers used in beq
         int rs = 0, rt = 1;
 
-        // The minimum length for this command is 14 (and$tt,$tt,$tt)
-        if (code.length() < 14) {
-            invalidLine();
-        }
         // Splits the different parameters of the command
         String[] parts = code.substring(3).trim().split("\s*,\s*");
 
-        // Checks to make sure there were exactly 3 parameters
-        if (parts.length != 3) {
-            invalidLine();
-        }
         int offset = 0;
-        if (registers.get(parts[0])==registers.get(parts[1])) {
+        if (registers.get(parts[0]) == registers.get(parts[1])) {
 
             try {
                 if (parts[2].matches("^(0x)[0-9A-F]{1,4}$")) {
@@ -74,8 +66,9 @@ public class Beq extends Instruction{
             } catch (Exception NumberFormatException) {
                 invalidLine();
             }
+            return pc + offset;
         }
-        return offset;
+        return pc + 1;
     }
 
 }

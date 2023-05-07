@@ -50,22 +50,12 @@ public class Lw extends Instruction{
     @Override
     public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
         // The 2 registers used in lw
-        int rs = 0,rt = 1;
+        int rt = 0,rs = 2;
 
-        // The minimum length for this command is 12 (lw$tt,x($tt))
-        if (code.length() < 12 ) {
-            invalidLine();
-        }
         // Splits the different parameters of the command
         code = code.replaceAll("[(]", ",");
         code = code.replaceAll("[)]", "");
         String[] parts = code.substring(2).trim().split("\s*,\s*");
-
-        // Checks to make sure there were exactly 3 parameters
-        if (parts.length != 3) {
-            invalidLine();
-        }
-
 
         // Checks if the offset is in dec or hex and converts it to its binary representation
         int offset = 0;
@@ -79,8 +69,9 @@ public class Lw extends Instruction{
         } catch (Exception NumberFormatException) {
             invalidLine();
         }
-        registers.put(parts[rt], registers.get(parts[offset]) + registers.get(parts[rs]));
 
-        return pc+1; //unusre how to use data memory
+        // Load the data in memory location rs + offset into rt
+        registers.put(parts[rt], dataMemory[offset + registers.get(parts[rs])]);
+        return pc+1;
     }
 }

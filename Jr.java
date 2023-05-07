@@ -34,19 +34,9 @@ public class Jr extends Instruction{
         // The 1 register used in Jr
         int rs=0;
 
-        // The minimum length for this command is 5 (jr$ra)
-        if (code.length() < 5 ) {
-            invalidLine();
-        }
-
         // Splits the different parameters of the command
         String[] parts = code.substring(2).trim().split("\s*,\s*");
 
-        if (parts.length != 1) {
-            invalidLine();
-        }
-
-        registers.put(parts[pc], registers.get(parts[rs]));
-        return pc+1; //or just return rs?
+        return registers.get(parts[0]);
     }
 }

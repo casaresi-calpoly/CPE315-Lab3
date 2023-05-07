@@ -53,21 +53,11 @@ public class Sll extends Instruction {
     @Override
     public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
         // The 2 registers used in sll
-        int rt = 0, rd = 1;
+        int rd = 0, rt = 1;
         int sa = 0;
 
-        // The minimum length for this command is 12 (sll$tt,$tt,1)
-        if (code.length() < 12) {
-            invalidLine();
-        }
         // Splits the different parameters of the command
         String[] parts = code.substring(3).trim().split("\s*,\s*");
-
-        // Checks to make sure there were exactly 3 parameters
-        if (parts.length != 3) {
-            invalidLine();
-        }
-
 
         // Extracts the sa integer, whether in hex or in decimal form, from the parameter
         try {
@@ -80,7 +70,7 @@ public class Sll extends Instruction {
         } catch (Exception NumberFormatException) {
             invalidLine();
         }
-        registers.put(parts[rd], registers.get(parts[rt]) << registers.get(parts[sa]));
+        registers.put(parts[rd], registers.get(parts[rt]) << sa);
         return pc+1;
     }
 }

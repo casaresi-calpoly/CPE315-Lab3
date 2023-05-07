@@ -40,19 +40,10 @@ public class Slt extends Instruction{
     @Override
     public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
         // The 3 registers used in Slt
-        int rs = 0, rt = 1, rd = 2;
+        int rd = 0, rs = 1, rt = 2;
 
-        // The minimum length for this command is 14 (slt$tt,$tt,$tt)
-        if (code.length() < 14 ) {
-            invalidLine();
-        }
         // Splits the different parameters of the command
         String[] parts = code.substring(3).trim().split("\s*,\s*");
-
-        // Checks to make sure there were exactly 3 parameters
-        if (parts.length != 3) {
-            invalidLine();
-        }
 
         registers.put(parts[rd], booleanToInt(registers.get(parts[rs]) < registers.get(parts[rt])));
         return pc+1;

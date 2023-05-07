@@ -40,19 +40,11 @@ public class Or extends Instruction{
 
     @Override
     public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
-        int rs = 0, rt = 1, rd = 2;
+        int rd = 0, rs = 1, rt = 2;
 
-        // The minimum length for this command is 13 (or$tt,$tt,$tt)
-        if (code.length() < 13 ) {
-            invalidLine();
-        }
         // Splits the different parameters of the command
         String[] parts = code.substring(2).trim().split("\s*,\s*");
 
-        // Checks to make sure there were exactly 3 parameters
-        if (parts.length != 3) {
-            invalidLine();
-        }
         registers.put(parts[rd], registers.get(parts[rs]) | registers.get(parts[rt]));
 
         return pc+1;

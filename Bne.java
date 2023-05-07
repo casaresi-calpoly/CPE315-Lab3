@@ -50,17 +50,9 @@ public class Bne extends Instruction{
     public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
         int rs = 0, rt = 1;
 
-        // The minimum length for this command is 14 (and$tt,$tt,$tt)
-        if (code.length() < 14) {
-            invalidLine();
-        }
         // Splits the different parameters of the command
         String[] parts = code.substring(3).trim().split("\s*,\s*");
 
-        // Checks to make sure there were exactly 3 parameters
-        if (parts.length != 3) {
-            invalidLine();
-        }
         int offset = 0;
         if (registers.get(parts[0]) !=registers.get(parts[1])) {
 
@@ -73,7 +65,8 @@ public class Bne extends Instruction{
             } catch (Exception NumberFormatException) {
                 invalidLine();
             }
+            return pc + offset;
         }
-        return offset;
+        return pc + 1;
     }
 }

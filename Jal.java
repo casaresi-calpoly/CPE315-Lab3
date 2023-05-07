@@ -38,18 +38,10 @@ public class Jal extends Instruction{
 
     @Override
     public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
-        if (code.length() < 5) {
-            invalidLine();
-        }
         // Splits the different parameters of the command
         String[] parts = code.substring(3).trim().split("\s*,\s*");
 
-        // Checks to make sure there were exactly 1 parameter
-        if (parts.length != 1) {
-            invalidLine();
-        }
-
-//        // Checks if the target is in dec or hex and converts it to its binary representation
+        // Checks if the target is in dec or hex and converts it to its binary representation
         int target = 0;
         try {
             if (parts[0].matches("^(0x)[0-9A-F]{1,4}$")) {
@@ -61,6 +53,9 @@ public class Jal extends Instruction{
         } catch (Exception NumberFormatException) {
             invalidLine();
         }
+
+        registers.put("$ra", pc);
+
         return target;   //how to put target in $ra since that is a label; r31=pc
     }
 }

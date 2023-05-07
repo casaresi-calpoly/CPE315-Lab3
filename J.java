@@ -41,10 +41,6 @@ public class J extends Instruction{
     public int run_code(HashMap<String, Integer> registers, int[] dataMemory, int pc) {
         String[] parts = code.substring(1).trim().split("\s*,\s*");
 
-        // Checks to make sure there were exactly 1 parameter
-        if (parts.length != 1) {
-            invalidLine();
-        }
 
         // Checks if the target is in dec or hex and converts it to its binary representation
         int target = 0;
