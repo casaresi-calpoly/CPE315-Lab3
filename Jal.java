@@ -54,7 +54,7 @@ public class Jal extends Instruction{
             invalidLine();
         }
 
-        registers.put("$ra", pc);
+        registers.put("$ra", pc + 1);
 
         return target;   //how to put target in $ra since that is a label; r31=pc
     }
