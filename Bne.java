@@ -65,7 +65,7 @@ public class Bne extends Instruction{
             } catch (Exception NumberFormatException) {
                 invalidLine();
             }
-            return pc + offset;
+            return pc + offset + 1;
         }
         return pc + 1;
     }
