@@ -327,7 +327,7 @@ public class Main {
                 // Display data memory from location num1 to num2
                 else if (script.matches("^m [0-9]+ [0-9]+$")) {
                     String[] indices = script.substring(2).split("\s");
-                    for (int i = Integer.parseInt(indices[0]); i < Integer.parseInt(indices[1]); i++) {
+                    for (int i = Integer.parseInt(indices[0]); i <= Integer.parseInt(indices[1]); i++) {
                         System.out.printf("\n[%d] = %d", i, dataMemory[i]);
                     }
                     return pc;
