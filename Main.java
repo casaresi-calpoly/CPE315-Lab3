@@ -39,7 +39,8 @@ public class Main {
         if (args.length == 2) {
             instBr = new BufferedReader(new FileReader(args[1]));
             String script;
-            while ((script = br.readLine()) != null) {
+            while ((script = instBr.readLine()) != null && pc != -1) {
+                System.out.printf("mips> %s\n", script);
                 pc = runScriptCommand(registers, dataMemory, instructions, script, pc);
             }
             instBr.close();
@@ -47,7 +48,7 @@ public class Main {
         else {
             BufferedReader input = new BufferedReader( new InputStreamReader(System.in));
             while (pc != -1) {
-                System.out.print("\nmips> ");
+                System.out.print("mips> ");
                 String script = input.readLine();
                 pc = runScriptCommand(registers, dataMemory, instructions, script, pc);
             }
@@ -256,25 +257,25 @@ public class Main {
         switch(script) {
             // Show Help
             case "h":
-                System.out.println("h = show help\n" +
+                System.out.println("\nh = show help\n" +
                         "d = dump register state\n" +
                         "s = single step through the program (i.e. execute 1 instruction and stop)\n" +
                         "s num = step through num instructions of the program\n" +
                         "r = run until the program ends\n" +
                         "m num1 num2 = display data memory from location num1 to num2\n" +
                         "c = clear all registers, memory, and the program counter to 0\n" +
-                        "q = exit the program");
+                        "q = exit the program\n");
                 return pc;
             // Dump Registers
             case "d":
-                System.out.printf("pc = %d\n" +
-                        "\t$0 = %d         $v0 = %d        $v1 = %d        $a0 = %d\n" +
-                        "\t$a1 = %d        $a2 = %d        $a3 = %d        $t0 = %d\n" +
-                        "\t$t1 = %d        $t2 = %d        $t3 = %d        $t4 = %d\n" +
-                        "\t$t5 = %d        $t6 = %d        $t7 = %d        $s0 = %d\n" +
-                        "\t$s1 = %d        $s2 = %d        $s3 = %d        $s4 = %d\n" +
-                        "\t$s5 = %d        $s6 = %d        $s7 = %d        $t8 = %d\n" +
-                        "\t$t9 = %d        $sp = %d        $ra = %d", pc, registers.get("$0"), registers.get("$v0"),
+                System.out.printf("\npc = %d\n" +
+                        "$0 = %d          $v0 = %d         $v1 = %d         $a0 = %d\n" +
+                        "$a1 = %d         $a2 = %d         $a3 = %d         $t0 = %d\n" +
+                        "$t1 = %d         $t2 = %d         $t3 = %d         $t4 = %d\n" +
+                        "$t5 = %d         $t6 = %d         $t7 = %d         $s0 = %d\n" +
+                        "$s1 = %d         $s2 = %d         $s3 = %d         $s4 = %d\n" +
+                        "$s5 = %d         $s6 = %d         $s7 = %d         $t8 = %d\n" +
+                        "$t9 = %d         $sp = %d         $ra = %d\n\n", pc, registers.get("$0"), registers.get("$v0"),
                         registers.get("$v1"), registers.get("$a0"), registers.get("$a1"), registers.get("$a2"),
                         registers.get("$a3"), registers.get("$t0"), registers.get("$t1"), registers.get("$t2"),
                         registers.get("$t3"), registers.get("$t4"), registers.get("$t5"), registers.get("$t6"),
@@ -290,7 +291,7 @@ public class Main {
                     System.exit(0);
                 }
                 pc = instructions[pc].run_code(registers, dataMemory, pc);
-                System.out.println("1 instruction(s) executed");
+                System.out.print("        1 instruction(s) executed\n");
                 return pc;
             // Run until program ends
             case "r":
@@ -304,7 +305,7 @@ public class Main {
                 registers.replaceAll((key, value) -> value = 0);
                 // Clear memory
                 Arrays.fill(dataMemory, 0);
-                System.out.println("Simulator reset");
+                System.out.println("        Simulator reset\n");
                 // Reset program counter
                 return STARTING_ADDRESS;
             // Exit the program
@@ -320,7 +321,7 @@ public class Main {
                         }
                         pc = instructions[pc].run_code(registers, dataMemory, pc);
                     }
-                    System.out.printf("%d instruction(s) executed", Integer.parseInt(script.substring(2)));
+                    System.out.printf("        %d instruction(s) executed\n", Integer.parseInt(script.substring(2)));
                     return pc;
                 }
                 // Display data memory from location num1 to num2
