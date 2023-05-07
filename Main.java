@@ -330,6 +330,7 @@ public class Main {
                     for (int i = Integer.parseInt(indices[0]); i <= Integer.parseInt(indices[1]); i++) {
                         System.out.printf("\n[%d] = %d", i, dataMemory[i]);
                     }
+                    System.out.println("");
                     return pc;
                 }
                 // Invalid script command
