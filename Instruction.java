@@ -6,13 +6,11 @@ public abstract class Instruction {
     public int address;
     public String machineCode;
 
-    public int intCode;
 
     public Instruction(String code, int address) {
         this.code = code;
         this.address = address;
         generate_machine_code();
-        intCode = binToInt(machineCode);
     }
 
     public abstract void generate_machine_code();

@@ -2,7 +2,7 @@ import java.util.HashMap;
 
 //Lab 2- Rajvir Vyas and Daniel Casares-Iglesias
 public class Addi extends Instruction{
-    String ADDI_OPCODE = "001000";
+    static String ADDI_OPCODE = "001000";
     public Addi(String code, int address) {
         super(code, address);
         generate_machine_code();

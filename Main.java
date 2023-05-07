@@ -42,15 +42,17 @@ public class Main {
             while ((script = br.readLine()) != null) {
                 pc = runScriptCommand(registers, dataMemory, instructions, script, pc);
             }
+            instBr.close();
         }
         else {
+            BufferedReader input = new BufferedReader( new InputStreamReader(System.in));
             while (pc != -1) {
                 System.out.print("\nmips> ");
-                String script = System.console().readLine();
+                String script = input.readLine();
                 pc = runScriptCommand(registers, dataMemory, instructions, script, pc);
             }
+            input.close();
         }
-
     }
 
     private static void findLabels(BufferedReader br, HashMap<String, Integer> labels, ArrayList<String> instructions) throws IOException {
